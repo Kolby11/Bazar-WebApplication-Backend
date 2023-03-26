@@ -1,7 +1,7 @@
 const express=require("express")
 const router = express.Router();
 
-const {getAllUsers, createUser, getUser, editUser, deleteUser}=require('../controllers/users')
+const {getAllUsers, createUser, getUser, editUser, deleteUser}=require('../controllers/user')
 
 router.route("/").get(getAllUsers)
 router.route("/createUser").post(createUser)
