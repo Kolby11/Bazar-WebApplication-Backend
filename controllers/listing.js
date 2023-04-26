@@ -23,8 +23,7 @@ const getAllListings = (req, res) => {
 const createListing = (req, res) => {
   const listing = req.body;
   if (listing) {
-    const query = `INSERT INTO listings (user_id, name, price, locality, description, watch_count, category_id) 
-                   VALUES (?, ?, ?, ?, ?, ?, ?)`;
+    const query = `INSERT INTO listings (user_id, name, price, locality, description, watch_count, category_id) VALUES (?, ?, ?, ?, ?, ?, ?)`;
     const values = [
       listing.user_id,
       listing.name,
@@ -65,6 +64,25 @@ const getListing = (req, res) => {
   });
 };
 
+//get listings by user
+const getUserListings = (req, res) => {
+  const { userId } = req.params;
+  if (!userId) {
+    return res.status(400).json({ success: false, msg: "User ID is not defined" });
+  }
+  const query = `SELECT * FROM listings WHERE user_id = ?`;
+  database.query(query, [userId], (error, results, fields) => {
+    if (error) {
+      console.error(error);
+      return res.status(500).json({ success: false, msg: "Failed to retrieve listings" });
+    }
+    if (results.length === 0) {
+      return res.status(400).json({ success: false, msg: "User has no listings" });
+    }
+    return res.status(200).json({ success: true, data: results });
+  });
+};
+
 //edit listing
 const editListing = (req, res) => {
   const id = req.params.id;
@@ -99,5 +117,5 @@ const deleteListing = (req, res) => {
 };
 
 module.exports={
-    getAllListings, createListing, getListing, editListing, deleteListing
+    getAllListings, createListing, getListing, getUserListings, editListing, deleteListing
 }
