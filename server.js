@@ -18,10 +18,12 @@ app.use(express.urlencoded())
 const listings=require("./routes/listing")
 const users=require("./routes/user")
 const categories=require("./routes/category")
+const services=require("./routes/service")
 
 app.use('/api/v1/listing', listings)
 app.use('/api/v1/user', users)
 app.use('/api/v1/category', categories)
+app.use('/api/v1/service', services)
 
 const port=5000
 

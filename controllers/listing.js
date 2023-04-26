@@ -23,14 +23,13 @@ const getAllListings = (req, res) => {
 const createListing = (req, res) => {
   const listing = req.body;
   if (listing) {
-    const query = `INSERT INTO listings (user_id, name, price, locality, description, watch_count, category_id) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+    const query = `INSERT INTO listings (user_id, name, price, locality, description, category_id) VALUES (?, ?, ?, ?, ?, ?)`;
     const values = [
       listing.user_id,
       listing.name,
       listing.price,
       listing.locality,
       listing.description,
-      listing.watch_count,
       listing.category_id
     ];
     database.query(query, values, (error, results, fields) => {
