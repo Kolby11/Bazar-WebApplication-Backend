@@ -1,4 +1,5 @@
 const database=require("../database")
+const authUtils=require("../utils/authUtils")
 
 //getting all listings
 const getAllListings = (req, res) => {
@@ -21,11 +22,19 @@ const getAllListings = (req, res) => {
 
 //create listing
 const createListing = (req, res) => {
-  const listing = req.body;
+  const authId=req.body.authId;
+  const listing = req.body.listing;
+  if(!authId){
+    return res.status(401).json({success: false, msg: "Missing authId"})
+  }
+  userId=authUtils.getUserIdWithAuthUserId(authId)
+  if(userId==0){
+    return res.status(401).json({success: false, msg: "User is not logged in"})
+  }
   if (listing) {
     const query = `INSERT INTO listings (user_id, name, price, locality, description, category_id) VALUES (?, ?, ?, ?, ?, ?)`;
     const values = [
-      listing.user_id,
+      userId,
       listing.name,
       listing.price,
       listing.locality,
@@ -84,10 +93,18 @@ const getUserListings = (req, res) => {
 
 //edit listing
 const editListing = (req, res) => {
-  const id = req.params.id;
-  const { name, price, locality, description, category_id } = req.body;
+  const listingId = req.body.listingId;
+  const authId=req.body.authId;
+  const listing = req.body.listing;
+  if(!authId){
+    return res.status(401).json({success: false, msg: "Missing authId"})
+  }
+  userId=authUtils.getUserIdWithAuthUserId(authId)
+  if(userId==0){
+    return res.status(401).json({success: false, msg: "User is not logged in"})
+  }
   const query = `UPDATE listings SET name = ?, price = ?, locality = ?, description = ?, category_id = ? WHERE id = ?`;
-  database.query(query, [name, price, locality, description, category_id, id], (error, results, fields) => {
+  database.query(query, [listing.name, listing.price, listing.locality, listing.description, listing.category_id, listingId], (error, results, fields) => {
     if (error) {
       console.error(error);
       return res.status(500).json({ success: false, msg: "Failed to update listing" });
@@ -101,7 +118,16 @@ const editListing = (req, res) => {
 
 //delete listing
 const deleteListing = (req, res) => {
-  const id = req.params.id;
+  const authId = req.body.authId
+  const listingId = req.body.listingId
+  if(!authId){
+    return res.status(401).json({success: false, msg: "Missing authId"})
+  }
+  userId=authUtils.getUserIdWithSessionUserId(authId)
+  if(userId!=0){
+    return res.status(401).json({success: false, msg: "User is not logged in"})
+  }
+  //implement
   const query = `DELETE FROM listings WHERE id = ${id}`;
   database.query(query, id, (error, results, fields) => {
     if (error) {

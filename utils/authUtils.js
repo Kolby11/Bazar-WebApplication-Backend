@@ -1,16 +1,16 @@
 const session=require("../session")
 const database=require("../database")
 
-const getUserIdWithSessionUserId = (sessionUserId)=>{
+const getUserIdWithAuthUserId = (authId)=>{
   for(const loggedUserId in session.loggedUsers){
-    if(loggedUserId === sessionUserId){
+    if(loggedUserId === authId){
       return loggedUserId
     }
   }
   return 0
 }
 
-const isListingOwner = (sessionUserId, listingId)=>{
+const isListingOwner = (authId, listingId)=>{
 
 }
-module.exports={getUserIdWithSessionUserId}
+module.exports={getUserIdWithAuthUserId}
