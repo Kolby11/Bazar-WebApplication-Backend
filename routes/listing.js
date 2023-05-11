@@ -7,7 +7,7 @@ router.route("/").get(getAllListings)
 router.route("/createListing").post(createListing)
 router.route("/getListing/:id").get(getListing)
 router.route("/getUserListings/:userId").get(getUserListings)
-router.route("/editListing/:id").put(editListing)
-router.route("/deleteListing/:id").delete(deleteListing)
+router.route("/editListing/").put(editListing)
+router.route("/deleteListing/").delete(deleteListing)
 
 module.exports = router

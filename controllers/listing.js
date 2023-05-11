@@ -3,12 +3,14 @@ const authUtils=require("../utils/authUtils")
 
 //getting all listings
 const getAllListings = (req, res) => {
-  const { limit } = req.query;
+  const from = req.body.from;
+  const to = req.body.to;
   let query = `SELECT * FROM listings`;
   const values = [];
-  if (limit) {
-    query = `SELECT * FROM listings LIMIT ?`;
-    values.push(parseInt(limit));
+  if (from && to) {
+    limit=to-from
+    query = `SELECT * FROM listings LIMIT ? OFFSET ?`;
+    values.push(limit, from);
   }
   database.query(query, values, (error, results, fields) => {
     if (error) {
@@ -93,18 +95,29 @@ const getUserListings = (req, res) => {
 
 //edit listing
 const editListing = (req, res) => {
-  const listingId = req.body.listingId;
   const authId=req.body.authId;
+  const listingId = req.body.listingId;
   const listing = req.body.listing;
+  const values = [
+    listing.name, 
+    listing.price, 
+    listing.locality, 
+    listing.description, 
+    listing.category_id, 
+    listingId
+  ]
   if(!authId){
     return res.status(401).json({success: false, msg: "Missing authId"})
   }
-  userId=authUtils.getUserIdWithAuthUserId(authId)
+  const userId=authUtils.getUserIdWithAuthUserId(authId)
   if(userId==0){
     return res.status(401).json({success: false, msg: "User is not logged in"})
   }
+  if(authUtils.isListingOwner(listingId, userId)==false){
+    return res.status(403).json({success: false, msg: "User is not owner of the listing"})
+  }
   const query = `UPDATE listings SET name = ?, price = ?, locality = ?, description = ?, category_id = ? WHERE id = ?`;
-  database.query(query, [listing.name, listing.price, listing.locality, listing.description, listing.category_id, listingId], (error, results, fields) => {
+  database.query(query, values , (error, results, fields) => {
     if (error) {
       console.error(error);
       return res.status(500).json({ success: false, msg: "Failed to update listing" });
@@ -123,13 +136,15 @@ const deleteListing = (req, res) => {
   if(!authId){
     return res.status(401).json({success: false, msg: "Missing authId"})
   }
-  userId=authUtils.getUserIdWithSessionUserId(authId)
-  if(userId!=0){
+  const userId=authUtils.getUserIdWithAuthUserId(authId)
+  if(userId==0){
     return res.status(401).json({success: false, msg: "User is not logged in"})
   }
-  //implement
-  const query = `DELETE FROM listings WHERE id = ${id}`;
-  database.query(query, id, (error, results, fields) => {
+  if(authUtils.isListingOwner(listingId, userId)==false){
+    return res.status(403).json({success: false, msg: "User is not owner of the listing"})
+  }
+  const query = "DELETE FROM listings WHERE id = ?";
+  database.query(query, [listingId], (error, results, fields) => {
     if (error) {
       console.error(error);
       return res.status(500).json({ success: false, msg: "Failed to delete listing" });
