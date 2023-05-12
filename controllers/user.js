@@ -2,9 +2,10 @@ const database=require("../database")
 
 //getting all users
 const getAllUsers = (req, res) => {
-  const limit = req.query.limit;
+  const from = req.body.from;
+  const to = req.body.to;
   if (limit) {
-    database.query(`SELECT * FROM users LIMIT ?`, limit, (error, results, fields) => {
+    database.query(`SELECT id, username, email, phone_number FROM users LIMIT ?`, limit, (error, results, fields) => {
       if (error) {
         console.error(error);
         return res.status(500).json({ success: false, msg: "Failed to retrieve users" });

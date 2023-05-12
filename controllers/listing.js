@@ -96,7 +96,7 @@ const getUserListings = (req, res) => {
 //edit listing
 const editListing = (req, res) => {
   const authId=req.body.authId;
-  const listingId = req.body.listingId;
+  const listingId = req.params.id;
   const listing = req.body.listing;
   const values = [
     listing.name, 
@@ -132,7 +132,7 @@ const editListing = (req, res) => {
 //delete listing
 const deleteListing = (req, res) => {
   const authId = req.body.authId
-  const listingId = req.body.listingId
+  const listingId = req.params.id
   if(!authId){
     return res.status(401).json({success: false, msg: "Missing authId"})
   }
