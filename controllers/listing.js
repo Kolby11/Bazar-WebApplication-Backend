@@ -19,7 +19,7 @@ const getAllListings = (req, res) => {
   else if(to && !from){
     query = `SELECT * FROM listings LIMIT ? `;
     values=[to];
-  }abase.query(query, values, (error, results, fields) => {
+  }database.query(query, values, (error, results, fields) => {
     if (error) {
       console.error(error);
       return res.status(500).json({ success: false, msg: "Failed to retrieve listings" });

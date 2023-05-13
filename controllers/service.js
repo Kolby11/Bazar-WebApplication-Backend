@@ -1,5 +1,6 @@
 const database = require("../database");
 const session = require("../session");
+const authUtils = require("../utils/authUtils")
 
 const createLoginIndentifier = (userId) => {
   let identifier = "";
@@ -39,9 +40,9 @@ const login = (req, res) => {
         }
       }
 
-      const identifierTmp = createLoginIndentifier(userId);
-      session.loggedUsers[identifierTmp] = userId;
-      return res.status(200).json({ success: true, msg: "User successfully logged in", userLoginIdentifier: identifierTmp });
+      const authId = authUtils.createUserAuth(userId)
+      session.loggedUsers[authId] = userId;
+      return res.status(200).json({ success: true, msg: "User successfully logged in", userAuth: authId});
     } else {
       return res.status(401).json({ success: false, msg: "Wrong password" });
     }
@@ -63,6 +64,7 @@ const register = (req, res) => {
         console.error(error);
         return res.status(500).json({ success: false, msg: "Failed to register" });
       }
+
       return res.status(201).json({ success: true, msg: "User registered successfully", id: results.insertId });
     });
   } else {
