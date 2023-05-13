@@ -3,16 +3,23 @@ const authUtils=require("../utils/authUtils")
 
 //getting all listings
 const getAllListings = (req, res) => {
-  const from = req.body.from;
-  const to = req.body.to;
+  const from = Number(req.query.from)-1;
+  const to = Number(req.query.to);
   let query = `SELECT * FROM listings`;
-  const values = [];
+  let values=[]
   if (from && to) {
     limit=to-from
     query = `SELECT * FROM listings LIMIT ? OFFSET ?`;
-    values.push(limit, from);
+    values=[limit, from];
   }
-  database.query(query, values, (error, results, fields) => {
+  else if(from && !to){
+    query = `SELECT * FROM listings LIMIT 100 OFFSET ?`;
+    values=[from];
+  }
+  else if(to && !from){
+    query = `SELECT * FROM listings LIMIT ? `;
+    values=[to];
+  }abase.query(query, values, (error, results, fields) => {
     if (error) {
       console.error(error);
       return res.status(500).json({ success: false, msg: "Failed to retrieve listings" });
@@ -156,6 +163,11 @@ const deleteListing = (req, res) => {
   });
 };
 
+const getFilteredListings=(req, res)=>{
+  filter=req.body
+  query="SELECT * FROM LI"
+}
+
 module.exports={
-    getAllListings, createListing, getListing, getUserListings, editListing, deleteListing
+    getAllListings, createListing, getListing, getUserListings, editListing, deleteListing, getFilteredListings
 }

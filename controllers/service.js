@@ -41,7 +41,6 @@ const login = (req, res) => {
 
       const identifierTmp = createLoginIndentifier(userId);
       session.loggedUsers[identifierTmp] = userId;
-      console.log(session.loggedUsers[identifierTmp]);
       return res.status(200).json({ success: true, msg: "User successfully logged in", userLoginIdentifier: identifierTmp });
     } else {
       return res.status(401).json({ success: false, msg: "Wrong password" });

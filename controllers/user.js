@@ -1,44 +1,33 @@
 const database=require("../database")
+const authUtils=require("../utils/authUtils")
 
 //getting all users
 const getAllUsers = (req, res) => {
-  const from = req.body.from;
-  const to = req.body.to;
-  if (limit) {
-    database.query(`SELECT id, username, email, phone_number FROM users LIMIT ?`, limit, (error, results, fields) => {
-      if (error) {
-        console.error(error);
-        return res.status(500).json({ success: false, msg: "Failed to retrieve users" });
-      }
-      return res.status(200).json({ success: true, data: results });
-    });
-  } else {
-    database.query(`SELECT * FROM users`, (error, results, fields) => {
-      if (error) {
-        console.error(error);
-        return res.status(500).json({ success: false, msg: "Failed to retrieve users" });
-      }
-      return res.status(200).json({ success: true, data: results });
-    });
+  const from = Number(req.query.from)-1;
+  const to = Number(req.query.to);
+  let query = `SELECT id, username, email, phone_number FROM users`;
+  let values=[]
+  if (from && to) {
+    limit=to-from
+    query = `SELECT id, username, email, phone_number FROM users LIMIT ? OFFSET ?`;
+    values=[limit, from];
   }
-};
-
-//creating user
-const createUser = (req, res) => {
-  const user = req.body;
-  if (!user) {
-    return res.status(400).json({ success: false, msg: "Please provide user data" });
+  else if(from && !to){
+    query = `SELECT id, username, email, phone_number FROM users LIMIT 100 OFFSET ?`;
+    values=[from];
   }
-  const { username, password, email, phone_number } = user;
-  database.query(`INSERT INTO users (username, password, email, phone_number) VALUES (?, ?, ?, ?)`, [username, password, email, phone_number], (error, results, fields) => {
+  else if(to && !from){
+    query = `SELECT id, username, email, phone_number FROM users LIMIT ? `;
+    values=[to];
+  }
+  database.query(query, values, (error, results, fields) => {
     if (error) {
       console.error(error);
-      return res.status(500).json({ success: false, msg: "Failed to create user" });
+      return res.status(500).json({ success: false, msg: "Failed to retrieve users" });
     }
-    return res.status(201).json({ success: true, data: { id: results.insertId, username, email, phone_number } });
+    return res.status(200).json({ success: true, data: results });
   });
 };
-
 
 //getting single user
 const getUser = (req, res) => {
@@ -46,7 +35,7 @@ const getUser = (req, res) => {
   if (!id) {
     return res.status(400).json({ success: false, msg: "Please provide an id" });
   }
-  database.query(`SELECT * FROM users WHERE id = ?`, id, (error, results, fields) => {
+  database.query(`SELECT id, username, email, phone_number FROM users WHERE id = ?`, id, (error, results, fields) => {
     if (error) {
       console.error(error);
       return res.status(500).json({ success: false, msg: "Failed to retrieve user" });
@@ -61,8 +50,13 @@ const getUser = (req, res) => {
 
 //editing user
 const editUser = (req, res) => {
-  const { id } = req.params;
-  const { username, password, email, phone_number } = req.body;
+  const id = req.params.id;
+  const authId=req.body.authId
+  const { username, password, email, phone_number } = req.body.user;
+
+  if(!authUtils.isUserOwner(authId)){
+    return res.status(403).json({ success: false, msg: "You are not the owner of the account" });
+  } 
 
   if (!id || (!username && !password && !email && !phone_number)) {
     return res.status(400).json({ success: false, msg: "Please provide an id and at least one field to update" });
@@ -97,7 +91,11 @@ const editUser = (req, res) => {
 
 //delete user
 const deleteUser = (req, res) => {
-  const { id } = req.params;
+  const id = req.params.id;
+  const authId=req.body.authId
+  if(!authUtils.isUserOwner(authId)){
+    return res.status(403).json({ success: false, msg: "You are not the owner of the account" });
+  } 
   if (id) {
     database.query(`DELETE FROM users WHERE id=${id}`, (error, result) => {
       if (error) throw error;
@@ -114,5 +112,5 @@ const deleteUser = (req, res) => {
 
 
 module.exports={
-    getAllUsers, createUser, getUser, editUser, deleteUser
+    getAllUsers, getUser, editUser, deleteUser
 }

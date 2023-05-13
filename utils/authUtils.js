@@ -26,4 +26,10 @@ const isListingOwner = (listingId, userId)=>{
     }
   })
 }
-module.exports={getUserIdWithAuthUserId, isListingOwner}
+
+const isUserOwner = (authId, id)=>{
+  const tmpId=getUserIdWithAuthUserId(authId)
+  if (tmpId==id){return true}
+  return false
+}
+module.exports={getUserIdWithAuthUserId, isListingOwner, isUserOwner}
