@@ -42,7 +42,7 @@ const login = (req, res) => {
 
       const authId = authUtils.createUserAuth(userId)
       session.loggedUsers[authId] = userId;
-      return res.status(200).json({ success: true, msg: "User successfully logged in", userAuth: authId});
+      return res.status(200).json({ success: true, msg: "User successfully logged in", authId: authId});
     } else {
       return res.status(401).json({ success: false, msg: "Wrong password" });
     }

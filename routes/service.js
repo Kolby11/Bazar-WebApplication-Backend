@@ -3,7 +3,7 @@ const router=express.Router()
 
 const { login, register, logout } = require("../controllers/service")
 
-router.route("/login").get(login)
+router.route("/login").post(login)
 router.route("/register").post(register)
 router.route("/logout").get(logout)
 
