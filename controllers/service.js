@@ -64,7 +64,7 @@ const register = (req, res) => {
         console.error(error);
         return res.status(500).json({ success: false, msg: "Failed to register" });
       }
-
+      console.log("Register ucc")
       return res.status(201).json({ success: true, msg: "User registered successfully", id: results.insertId });
     });
   } else {
