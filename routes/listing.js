@@ -1,14 +1,22 @@
-const express=require("express")
+const express = require("express");
 const router = express.Router();
 
-const {getAllListings, createListing, getListing, getUserListings, editListing, deleteListing, getFilteredListings} = require("../controllers/listing")
+const {
+   getAllListings,
+   createListing,
+   getListing,
+   getUserListings,
+   editListing,
+   deleteListing,
+   getFilteredListings,
+} = require("../controllers/listing");
 
-router.route("/").get(getAllListings)
-router.route("/createListing").post(createListing)
-router.route("/getListing/:id").get(getListing)
-router.route("/getUserListings/:userId").get(getUserListings)
-router.route("/editListing/:id").put(editListing)
-router.route("/deleteListing/:id").delete(deleteListing)
-router.route("/getFilteredListings").get(getFilteredListings)
+router.route("/").get(getAllListings);
+router.route("/createListing").post(createListing);
+router.route("/getListing/:id").get(getListing);
+router.route("/getUserListings/:userId").get(getUserListings);
+router.route("/editListing/:id").put(editListing);
+router.route("/deleteListing/:id").delete(deleteListing);
+router.route("/getFilteredListings").get(getFilteredListings);
 
-module.exports = router
+module.exports = router;
