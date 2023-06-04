@@ -1,8 +1,11 @@
 const database = require("../utils/database");
 const authUtils = require("../utils/authUtils");
+const util = require("util");
 
-//getting all users
-const getAllUsers = (req, res) => {
+const queryAsync = util.promisify(database.query).bind(database);
+
+// Getting all users
+const getAllUsers = async (req, res) => {
    const from = Number(req.query.from) - 1;
    const to = Number(req.query.to);
    let query = `SELECT id, username, email, phone_number FROM users`;
@@ -18,39 +21,36 @@ const getAllUsers = (req, res) => {
       query = `SELECT id, username, email, phone_number FROM users LIMIT ? `;
       values = [to];
    }
-   database.query(query, values, (error, results, fields) => {
-      if (error) {
-         console.error(error);
-         return res.status(500).json({ success: false, msg: "Failed to retrieve users" });
-      }
+   try {
+      const results = await queryAsync(query, values);
       return res.status(200).json({ success: true, data: results });
-   });
+   } catch (error) {
+      console.error(error);
+      return res.status(500).json({ success: false, msg: "Failed to retrieve users" });
+   }
 };
 
-//getting single user
-const getUser = (req, res) => {
+// Getting a single user
+const getUser = async (req, res) => {
    const { id } = req.params;
    if (!id) {
       return res.status(400).json({ success: false, msg: "Please provide an id" });
    }
-   database.query(
-      `SELECT id, username, email, phone_number FROM users WHERE id = ?`,
-      id,
-      (error, results, fields) => {
-         if (error) {
-            console.error(error);
-            return res.status(500).json({ success: false, msg: "Failed to retrieve user" });
-         }
-         if (!results || results.length === 0) {
-            return res.status(404).json({ success: false, msg: "User not found" });
-         }
-         return res.status(200).json({ success: true, data: results[0] });
+   try {
+      const queryStr = `SELECT id, username, email, phone_number FROM users WHERE id = ?`;
+      const results = await queryAsync(queryStr, id);
+      if (!results || results.length === 0) {
+         return res.status(404).json({ success: false, msg: "User not found" });
       }
-   );
+      return res.status(200).json({ success: true, data: results[0] });
+   } catch (error) {
+      console.error(error);
+      return res.status(500).json({ success: false, msg: "Failed to retrieve user" });
+   }
 };
 
-//editing user
-const editUser = (req, res) => {
+// Editing a user
+const editUser = async (req, res) => {
    const id = req.params.id;
    const sessionStr = req.body.sessionStr;
    const { username, password, email, phone_number } = req.body.user;
@@ -79,34 +79,39 @@ const editUser = (req, res) => {
       updates.phone_number = phone_number;
    }
 
-   database.query(`UPDATE users SET ? WHERE id = ?`, [updates, id], (error, results, fields) => {
-      if (error) {
-         console.error(error);
-         return res.status(500).json({ success: false, msg: "Failed to update user" });
-      }
+   try {
+      const queryStr = `UPDATE users SET ? WHERE id = ?`;
+      const results = await queryAsync(queryStr, [updates, id]);
       if (results.affectedRows === 0) {
          return res.status(404).json({ success: false, msg: "User not found" });
       }
       return res.status(200).json({ success: true, msg: "User updated successfully" });
-   });
+   } catch (error) {
+      console.error(error);
+      return res.status(500).json({ success: false, msg: "Failed to update user" });
+   }
 };
 
-//delete user
-const deleteUser = (req, res) => {
+// Deleting a user
+const deleteUser = async (req, res) => {
    const id = req.params.id;
    const sessionStr = req.body.sessionStr;
    if (!authUtils.isUserOwner(sessionStr)) {
       return res.status(403).json({ success: false, msg: "You are not the owner of the account" });
    }
    if (id) {
-      database.query(`DELETE FROM users WHERE id=${id}`, (error, result) => {
-         if (error) throw error;
+      try {
+         const queryStr = `DELETE FROM users WHERE id = ?`;
+         const result = await queryAsync(queryStr, id);
          if (result.affectedRows === 0) {
             res.status(400).json({ success: false, msg: "User with id does not exist" });
          } else {
             res.json({ success: true, msg: `User with id ${id} has been deleted` });
          }
-      });
+      } catch (error) {
+         console.error(error);
+         return res.status(500).json({ success: false, msg: "Failed to delete user" });
+      }
    } else {
       res.status(400).json({ success: false, msg: "Id is not defined" });
    }

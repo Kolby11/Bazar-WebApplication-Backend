@@ -1,5 +1,8 @@
 const database = require("../utils/database");
 const authUtils = require("../utils/authUtils");
+const util = require("util");
+
+const queryAsync = util.promisify(database.query).bind(database);
 
 const getAllListings = async (req, res) => {
    const from = Number(req.query.from) - 1;
@@ -18,7 +21,7 @@ const getAllListings = async (req, res) => {
       values = [to];
    }
    try {
-      const results = await database.query(query, values);
+      const results = await queryAsync(query, values);
       return res.status(200).json({ success: true, data: results });
    } catch (error) {
       console.error(error);
@@ -26,14 +29,14 @@ const getAllListings = async (req, res) => {
    }
 };
 
-const createListing = (req, res) => {
+const createListing = async (req, res) => {
    const sessionStr = req.body.sessionStr;
    const listing = req.body.listing;
    if (!sessionStr) {
       return res.status(401).json({ success: false, msg: "Missing sessionStr" });
    }
    const userId = authUtils.getUserIdWithSessionStr(sessionStr);
-   if (userId === 0) {
+   if (!userId) {
       return res.status(401).json({ success: false, msg: "User is not logged in" });
    }
    if (listing) {
@@ -46,15 +49,15 @@ const createListing = (req, res) => {
          listing.description,
          listing.category_id,
       ];
-      database.query(query, values, (error, results, fields) => {
-         if (error) {
-            console.error(error);
-            return res.status(500).json({ success: false, msg: "Failed to create listing" });
-         }
+      try {
+         const results = await queryAsync(query, values);
          return res
             .status(201)
             .json({ success: true, msg: "Listing created successfully", id: results.insertId });
-      });
+      } catch (error) {
+         console.error(error);
+         return res.status(500).json({ success: false, msg: "Failed to create listing" });
+      }
    } else {
       return res.status(400).json({ success: false, msg: "Please provide listing" });
    }
@@ -67,7 +70,7 @@ const getListing = async (req, res) => {
    }
    const query = `SELECT * FROM listings WHERE id = ?`;
    try {
-      const results = await database.query(query, [id]);
+      const results = await queryAsync(query, [id]);
       if (results.length === 0) {
          return res.status(400).json({ success: false, msg: "Listing with ID does not exist" });
       }
@@ -79,13 +82,13 @@ const getListing = async (req, res) => {
 };
 
 const getUserListings = async (req, res) => {
-   const { userId } = req.params;
+   const userId = req.params.userId;
    if (!userId) {
       return res.status(400).json({ success: false, msg: "User ID is not defined" });
    }
    const query = `SELECT * FROM listings WHERE user_id = ?`;
    try {
-      const results = await database.query(query, [userId]);
+      const results = await queryAsync(query, [userId]);
       if (results.length === 0) {
          return res.status(400).json({ success: false, msg: "User has no listings" });
       }
@@ -111,20 +114,20 @@ const editListing = async (req, res) => {
    if (!sessionStr) {
       return res.status(401).json({ success: false, msg: "Missing sessionStr" });
    }
-   if (await !authUtils.isListingOwner(sessionStr, listingId)) {
-      return res.status(403).json({ success: false, msg: "User is not owner of the listing" });
+   if (!(await authUtils.isListingOwner(sessionStr, listingId))) {
+      return res.status(403).json({ success: false, msg: "User is not the owner of the listing" });
    }
    const query = `UPDATE listings SET name = ?, price = ?, locality = ?, description = ?, category_id = ? WHERE id = ?`;
-   database.query(query, values, (error, results, fields) => {
-      if (error) {
-         console.error(error);
-         return res.status(500).json({ success: false, msg: "Failed to update listing" });
-      }
+   try {
+      const results = await queryAsync(query, values);
       if (results.affectedRows === 0) {
          return res.status(404).json({ success: false, msg: "Listing not found" });
       }
       return res.status(200).json({ success: true, msg: "Listing updated successfully" });
-   });
+   } catch (error) {
+      console.error(error);
+      return res.status(500).json({ success: false, msg: "Failed to update listing" });
+   }
 };
 
 const deleteListing = async (req, res) => {
@@ -133,20 +136,20 @@ const deleteListing = async (req, res) => {
    if (!sessionStr) {
       return res.status(401).json({ success: false, msg: "Missing sessionStr" });
    }
-   if (!authUtils.isListingOwner(sessionStr, listingId)) {
-      return res.status(403).json({ success: false, msg: "User is not owner of the listing" });
+   if (!(await authUtils.isListingOwner(sessionStr, listingId))) {
+      return res.status(403).json({ success: false, msg: "User is not the owner of the listing" });
    }
    const query = "DELETE FROM listings WHERE id = ?";
-   database.query(query, [listingId], (error, results, fields) => {
-      if (error) {
-         console.error(error);
-         return res.status(500).json({ success: false, msg: "Failed to delete listing" });
-      }
+   try {
+      const results = await queryAsync(query, [listingId]);
       if (results.affectedRows === 0) {
          return res.status(404).json({ success: false, msg: "Listing not found" });
       }
       return res.status(200).json({ success: true, msg: "Listing deleted successfully" });
-   });
+   } catch (error) {
+      console.error(error);
+      return res.status(500).json({ success: false, msg: "Failed to delete listing" });
+   }
 };
 
 const getFilteredListings = (req, res) => {

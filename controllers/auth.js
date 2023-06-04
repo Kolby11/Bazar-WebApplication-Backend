@@ -1,5 +1,10 @@
 const database = require("../utils/database");
-const { addUserSession, removeUserSession, hashText } = require("../utils/authUtils");
+const {
+   addUserSession,
+   removeUserSession,
+   hashText,
+   getUserIdWithSessionStr,
+} = require("../utils/authUtils");
 const util = require("util");
 
 const queryAsync = util.promisify(database.query).bind(database);
@@ -16,9 +21,10 @@ const postLogin = async (req, res) => {
    }
 
    const sessionStr = await addUserSession(email, password);
+   const userId = getUserIdWithSessionStr(sessionStr);
 
-   if (sessionStr) {
-      return res.status(200).json({ success: true, sessionStr: sessionStr });
+   if (sessionStr && userId) {
+      return res.status(200).json({ success: true, sessionStr: sessionStr, userId: userId });
    } else {
       return res.status(500).json({ success: false, msg: "Session not generated" });
    }

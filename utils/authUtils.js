@@ -79,9 +79,14 @@ const getUserIdWithSessionStr = (sessionStr) => {
 };
 
 const isListingOwner = async (sessionStr, listingId) => {
-   const userId = getUserIdWithSessionStr(sessionStr);
    const queryStr = "SELECT user_id FROM listings WHERE id=?";
+   const userId = getUserIdWithSessionStr(sessionStr);
+   if (!userId) {
+      return false;
+   }
    try {
+      const results = await queryAsync(queryStr, [listingId]);
+
       if (results.length > 0) {
          if (userId === results[0].user_id) {
             return true;
