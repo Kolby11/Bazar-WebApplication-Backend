@@ -113,7 +113,7 @@ CREATE TABLE `photos` (
 CREATE TABLE `users` (
   `id` int(11) NOT NULL,
   `username` varchar(15) NOT NULL,
-  `password` varchar(15) NOT NULL,
+  `password` varchar(64) NOT NULL,
   `email` varchar(40) NOT NULL,
   `phone_number` varchar(12) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

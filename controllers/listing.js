@@ -1,41 +1,39 @@
 const database = require("../utils/database");
 const authUtils = require("../utils/authUtils");
 
-//getting all listings
-const getAllListings = (req, res) => {
+const getAllListings = async (req, res) => {
    const from = Number(req.query.from) - 1;
    const to = Number(req.query.to);
    let query = `SELECT * FROM listings`;
    let values = [];
    if (from && to) {
-      limit = to - from;
+      const limit = to - from;
       query = `SELECT * FROM listings LIMIT ? OFFSET ?`;
       values = [limit, from];
    } else if (from && !to) {
       query = `SELECT * FROM listings LIMIT 100 OFFSET ?`;
       values = [from];
    } else if (to && !from) {
-      query = `SELECT * FROM listings LIMIT ? `;
+      query = `SELECT * FROM listings LIMIT ?`;
       values = [to];
    }
-   database.query(query, values, (error, results, fields) => {
-      if (error) {
-         console.error(error);
-         return res.status(500).json({ success: false, msg: "Failed to retrieve listings" });
-      }
+   try {
+      const results = await database.query(query, values);
       return res.status(200).json({ success: true, data: results });
-   });
+   } catch (error) {
+      console.error(error);
+      return res.status(500).json({ success: false, msg: "Failed to retrieve listings" });
+   }
 };
 
-//create listing
 const createListing = (req, res) => {
    const sessionStr = req.body.sessionStr;
    const listing = req.body.listing;
    if (!sessionStr) {
       return res.status(401).json({ success: false, msg: "Missing sessionStr" });
    }
-   userId = authUtils.getUserIdWithAuthUserId(sessionStr);
-   if (userId == 0) {
+   const userId = authUtils.getUserIdWithSessionStr(sessionStr);
+   if (userId === 0) {
       return res.status(401).json({ success: false, msg: "User is not logged in" });
    }
    if (listing) {
@@ -62,46 +60,43 @@ const createListing = (req, res) => {
    }
 };
 
-//get single listing
-const getListing = (req, res) => {
+const getListing = async (req, res) => {
    const { id } = req.params;
    if (!id) {
       return res.status(400).json({ success: false, msg: "ID is not defined" });
    }
    const query = `SELECT * FROM listings WHERE id = ?`;
-   database.query(query, [id], (error, results, fields) => {
-      if (error) {
-         console.error(error);
-         return res.status(500).json({ success: false, msg: "Failed to retrieve listing" });
-      }
+   try {
+      const results = await database.query(query, [id]);
       if (results.length === 0) {
          return res.status(400).json({ success: false, msg: "Listing with ID does not exist" });
       }
       return res.status(200).json({ success: true, data: results });
-   });
+   } catch (error) {
+      console.error(error);
+      return res.status(500).json({ success: false, msg: "Failed to retrieve listing" });
+   }
 };
 
-//get listings by user
-const getUserListings = (req, res) => {
+const getUserListings = async (req, res) => {
    const { userId } = req.params;
    if (!userId) {
       return res.status(400).json({ success: false, msg: "User ID is not defined" });
    }
    const query = `SELECT * FROM listings WHERE user_id = ?`;
-   database.query(query, [userId], (error, results, fields) => {
-      if (error) {
-         console.error(error);
-         return res.status(500).json({ success: false, msg: "Failed to retrieve listings" });
-      }
+   try {
+      const results = await database.query(query, [userId]);
       if (results.length === 0) {
          return res.status(400).json({ success: false, msg: "User has no listings" });
       }
       return res.status(200).json({ success: true, data: results });
-   });
+   } catch (error) {
+      console.error(error);
+      return res.status(500).json({ success: false, msg: "Failed to retrieve listings" });
+   }
 };
 
-//edit listing
-const editListing = (req, res) => {
+const editListing = async (req, res) => {
    const sessionStr = req.body.sessionStr;
    const listingId = req.params.id;
    const listing = req.body.listing;
@@ -116,11 +111,7 @@ const editListing = (req, res) => {
    if (!sessionStr) {
       return res.status(401).json({ success: false, msg: "Missing sessionStr" });
    }
-   const userId = authUtils.getUserIdWithAuthUserId(sessionStr);
-   if (userId == 0) {
-      return res.status(401).json({ success: false, msg: "User is not logged in" });
-   }
-   if (authUtils.isListingOwner(listingId, userId) == false) {
+   if (await !authUtils.isListingOwner(sessionStr, listingId)) {
       return res.status(403).json({ success: false, msg: "User is not owner of the listing" });
    }
    const query = `UPDATE listings SET name = ?, price = ?, locality = ?, description = ?, category_id = ? WHERE id = ?`;
@@ -136,18 +127,13 @@ const editListing = (req, res) => {
    });
 };
 
-//delete listing
-const deleteListing = (req, res) => {
+const deleteListing = async (req, res) => {
    const sessionStr = req.body.sessionStr;
    const listingId = req.params.id;
    if (!sessionStr) {
       return res.status(401).json({ success: false, msg: "Missing sessionStr" });
    }
-   const userId = authUtils.getUserIdWithAuthUserId(sessionStr);
-   if (userId == 0) {
-      return res.status(401).json({ success: false, msg: "User is not logged in" });
-   }
-   if (authUtils.isListingOwner(listingId, userId) == false) {
+   if (!authUtils.isListingOwner(sessionStr, listingId)) {
       return res.status(403).json({ success: false, msg: "User is not owner of the listing" });
    }
    const query = "DELETE FROM listings WHERE id = ?";
@@ -164,8 +150,9 @@ const deleteListing = (req, res) => {
 };
 
 const getFilteredListings = (req, res) => {
-   filter = req.body;
-   query = "SELECT * FROM LI";
+   const filter = req.body;
+   const query = "SELECT * FROM listings";
+   // Add your filter logic and update the query accordingly
 };
 
 module.exports = {
