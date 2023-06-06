@@ -123,26 +123,26 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `username`, `password`, `email`, `phone_number`) VALUES
-(1, 'johnsmith', 'mypassword1', 'johnsmith@example.com', '1234567890'),
-(2, 'janeDoe', 'password123', 'janedoe@example.com', '2345678901'),
-(3, 'michalPichal', 'ilovemusic', 'michaelj@example.com', '3456789012'),
-(4, 'sarahc', 'letmein', 'sarahc@example.com', '4567890123'),
-(5, 'davidm', 'secretword', 'davidm@example.com', '5678901234'),
-(6, 'laurabrown', 'mypassword2', 'laurabrown@example.com', '6789012345'),
-(7, 'robertw', 'qwerty123', 'robertw@example.com', '7890123456'),
-(8, 'jennifers', 'password321', 'jennifers@example.com', '8901234567'),
-(9, 'matthewh', 'football23', 'matthewh@example.com', '9012345678'),
-(10, 'emilyw', 'welcome123', 'emilyw@example.com', '1234567891'),
-(11, 'chrismiller', 'mypass123', 'chrismiller@example.com', '2345678902'),
-(12, 'amandal', 'test123', 'amandal@example.com', '3456789013'),
-(13, 'jamesg', 'hello123', 'jamesg@example.com', '4567890124'),
-(14, 'oliviam', 'letmein123', 'oliviam@example.com', '5678901235'),
-(15, 'jacobt', 'mypassword3', 'jacobt@example.com', '6789012346'),
-(16, 'meganp', 'password456', 'meganp@example.com', '7890123457'),
-(17, 'williams', 'test456', 'williams@example.com', '8901234568'),
-(18, 'sophiaw', 'abc123', 'sophiaw@example.com', '9012345679'),
-(19, 'danielc', 'mysecret', 'danielc@example.com', '1234567892'),
-(20, 'emilyc', 'password789', 'emilyc@example.com', '2345678903');
+(1, 'johnsmith', '09343625c6c123d3434932fe1ce08bae5ac00a8f95bd746e10491b0bafdd1817', 'johnsmith@example.com', '1234567890'), --password1
+(2, 'janeDoe', 'ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f', 'janedoe@example.com', '2345678901'), --password123
+(3, 'michalPichal', '3baff57541a4f5dd1ebdddf30c6a4df665416727d56ece310b0f56ee86d80dd1', 'michaelj@example.com', '3456789012'), --ilovemusic
+(4, 'sarahc', '1c8bfe8f801d79745c4631d09fff36c82aa37fc4cce4fc946683d7b336b63032', 'sarahc@example.com', '4567890123'), --letmein
+(5, 'davidm', 'e69cdcb6168f4f894be8b21ff181b61b4c8f106c20ea9671c3e62b7e7e105da9', 'davidm@example.com', '5678901234'), --secretword
+(6, 'laurabrown', '8767a7d316ad68cb607c7c805b859ffa78277dda13b7a3e2e8b53cad3cabbc6e', 'laurabrown@example.com', '6789012345'), --mypassword2
+(7, 'robertw', 'daaad6e5604e8e17bd9f108d91e26afe6281dac8fda0091040a7a6d7bd9b43b5', 'robertw@example.com', '7890123456'), --qwerty123
+(8, 'jennifers', 'a20aff106fe011d5dd696e3b7105200ff74331eeb8e865bb80ebd82b12665a07', 'jennifers@example.com', '8901234567'), --password321
+(9, 'matthewh', '65997af054455acd2c8cb344b6ce9fb38aa1f02e03a5bc53bdcf188f26a57579', 'matthewh@example.com', '9012345678'), --football23
+(10, 'emilyw', 'a68349561396ec264a350847024a4521d00beaa3358660c2709a80f31c7acdd0', 'emilyw@example.com', '1234567891'), --welcome123
+(11, 'chrismiller', 'e6e07510d6531af5f403d1e6d0eb997855b6453488aaee6a9dd10ad5133f936a', 'chrismiller@example.com', '2345678902'), --mypass123
+(12, 'amandal', 'ecd71870d1963316a97e3ac3408c9835ad8cf0f3c1bc703527c30265534f75ae', 'amandal@example.com', '3456789013'), --test123
+(13, 'jamesg', '27cc6994fc1c01ce6659c6bddca9b69c4c6a9418065e612c69d110b3f7b11f8a', 'jamesg@example.com', '4567890124'), --hello123
+(14, 'oliviam', '9b0eb22aef89516d6fb4b31ccf008a68abe0d10a3fc606316389613eccf96854', 'oliviam@example.com', '5678901235'), --letmein123
+(15, 'jacobt', '8d41233e39c95b5da13361e354e1c9e639f07b27d397463a8f91b71ee07ccfb2', 'jacobt@example.com', '6789012346'), --mypassword3
+(16, 'meganp', 'c6ba91b90d922e159893f46c387e5dc1b3dc5c101a5a4522f03b987177a24a91', 'meganp@example.com', '7890123457'), --password456
+(17, 'williams', '50e49efde4e37d84b97b14ac4f7d03ba956f1413f7367090baeabac67bf69704', 'williams@example.com', '8901234568'), --test456
+(18, 'sophiaw', '6ca13d52ca70c883e0f0bb101e425a89e8624de51db2d2392593af6a84118090', 'sophiaw@example.com', '9012345679'), --abc123
+(19, 'danielc', '652c7dc687d98c9889304ed2e408c74b611e86a40caa51c4b43f1dd5913c5cd0', 'danielc@example.com', '1234567892'), --mysecret
+(20, 'emilyc', 'password789', 'emilyc@example.com', '2345678903'); --password789
 
 --
 -- Kľúče pre exportované tabuľky
