@@ -9,6 +9,7 @@ const {
    editListing,
    deleteListing,
    getFilteredListings,
+   saveListing,
 } = require("../controllers/listing");
 
 router.route("/").get(getAllListings);
@@ -18,5 +19,6 @@ router.route("/getUserListings/:userId").get(getUserListings);
 router.route("/editListing/:id").put(editListing);
 router.route("/deleteListing/:id").delete(deleteListing);
 router.route("/getFilteredListings").get(getFilteredListings);
+router.route("/saveListing").post(saveListing);
 
 module.exports = router;
