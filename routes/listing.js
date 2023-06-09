@@ -2,14 +2,15 @@ const express = require("express");
 const router = express.Router();
 
 const {
-   getAllListings,
-   createListing,
-   getListing,
-   getUserListings,
-   editListing,
-   deleteListing,
-   getFilteredListings,
-   saveListing,
+  getAllListings,
+  createListing,
+  getListing,
+  getUserListings,
+  editListing,
+  deleteListing,
+  getFilteredListings,
+  saveListing,
+  getSavedListings,
 } = require("../controllers/listing");
 
 router.route("/").get(getAllListings);
@@ -19,6 +20,5 @@ router.route("/getUserListings/:userId").get(getUserListings);
 router.route("/editListing/:id").put(editListing);
 router.route("/deleteListing/:id").delete(deleteListing);
 router.route("/getFilteredListings").get(getFilteredListings);
-router.route("/saveListing").post(saveListing);
 
 module.exports = router;

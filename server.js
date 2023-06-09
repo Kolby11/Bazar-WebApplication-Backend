@@ -18,11 +18,13 @@ app.use(express.urlencoded());
 const listings = require("./routes/listing");
 const users = require("./routes/user");
 const categories = require("./routes/category");
+const saved = require("./routes/saved");
 const auth = require("./routes/auth");
 
 app.use("/api/v1/listing", listings);
 app.use("/api/v1/user", users);
 app.use("/api/v1/category", categories);
+app.use("/api/v1/saved", saved);
 app.use("/api/v1/auth", auth);
 
 const port = 5000;
