@@ -48,7 +48,7 @@ const getSavedListings = async (req, res) => {
 	try {
 		const results = await queryAsync(query, userId);
 		return res
-			.status(201)
+			.status(200)
 			.json({ success: true, data: results });
 	} catch (error) {
 		console.error(error);
