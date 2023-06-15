@@ -7,7 +7,7 @@ const queryAsync = util.promisify(database.query).bind(database);
 
 const saveListing = async (req, res) => {
 	const query = `INSERT INTO saved (user_id, listing_id) VALUES (?, ?)`;
-	const {sessionStr, listingId} = req.body;
+	const {sessionStr, listingId} = req.body.data;
 
 	const userId=authUtils.getUserIdWithSessionStr(sessionStr);
 
