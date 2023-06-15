@@ -197,7 +197,7 @@ const deleteListing = async (req, res) => {
 };
 
 const getFilteredListings = async(req, res) => {
-  const filter = req.body;
+  const filter = req.query;
   const nameValue = `%${req.query.name}%`;
   const values = [nameValue, req.query.category_id, req.query.price];
   const query = "SELECT * FROM listings WHERE name LIKE ? AND category_id = ? AND price <= ?";
