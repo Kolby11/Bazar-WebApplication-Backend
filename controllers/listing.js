@@ -196,10 +196,28 @@ const deleteListing = async (req, res) => {
   }
 };
 
-const getFilteredListings = (req, res) => {
+const getFilteredListings = async(req, res) => {
   const filter = req.body;
-  const query = "SELECT * FROM listings";
+  const nameValue = `%${req.query.name}%`;
+  const values = [nameValue, req.query.category_id, req.query.price];
+  const query = "SELECT * FROM listings WHERE name LIKE ? AND category_id = ? AND price <= ?";
+
   // Add your filter logic and update the query accordingly
+
+  try {
+    const results = await queryAsync(query, values);
+    if (results.length === 0) {
+      return res
+        .status(400)
+        .json({ success: false, msg: "No listings found" });
+    }
+    return res.status(200).json({ success: true, data: results });
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ success: false, msg: "Failed to retrieve listings" });
+  }
 };
 
 const increaseViewCount = async (id) => {

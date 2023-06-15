@@ -8,9 +8,7 @@ const {
   getUserListings,
   editListing,
   deleteListing,
-  getFilteredListings,
-  saveListing,
-  getSavedListings,
+  getFilteredListings
 } = require("../controllers/listing");
 
 router.route("/").get(getAllListings);
